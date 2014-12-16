@@ -2,9 +2,16 @@
 class MoviesController < ApplicationController
 
   def index
-    @sortby = params[:sort]
-    @movies = Movie.all(:order => @sortby)
-   end
+    @sort_by = params[:sort]
+    @all_ratings = Movie.ratings
+    @selected_ratings = @all_ratings
+
+    if params[:commit] == 'Refresh'
+      @selected_ratings = []
+      params[:ratings].each_key { |k| @selected_ratings.push(k)} if not params[:ratings].nil?
+    end
+    @movies = Movie.where("rating" => @selected_ratings).order(@sort_by)
+  end
 
   def show
     id = params[:id] # retrieve movie ID from URI route
