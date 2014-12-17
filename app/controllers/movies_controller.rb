@@ -2,15 +2,26 @@
 class MoviesController < ApplicationController
 
   def index
-    @sort_by = params[:sort]
     @all_ratings = Movie.ratings
-    @selected_ratings = @all_ratings
 
-    if params[:commit] == 'Refresh'
-      @selected_ratings = []
-      params[:ratings].each_key { |k| @selected_ratings.push(k)} if not params[:ratings].nil?
+    if params[:sort]
+      session[:sort] = params[:sort]
     end
-    @movies = Movie.where("rating" => @selected_ratings).order(@sort_by)
+    @sort_by = session[:sort]
+
+    if params[:ratings]
+      session[:ratings] = params[:ratings]
+      @selected_ratings = []
+      session[:ratings].each_key { |k|  @selected_ratings.push(k)}
+    else
+      if session[:ratings]
+        flash.keep
+        redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings])
+      end
+    end
+    @movies = Movie.find(:all,
+                         :order => @sort_by,
+                         :conditions => {:rating => @selected_ratings})
   end
 
   def show
