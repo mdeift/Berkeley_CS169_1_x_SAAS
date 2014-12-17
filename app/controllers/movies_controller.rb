@@ -18,7 +18,7 @@ class MoviesController < ApplicationController
         flash.keep
         redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings])
       end
-      @movies = Movie.find(:all, :order => @sort_by)
+      @selected_ratings = @all_ratings
     end
     @movies = Movie.find(:all,
                          :order => @sort_by,
